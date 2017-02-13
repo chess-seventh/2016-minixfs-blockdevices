@@ -1,0 +1,27 @@
+include Makefile.inc
+
+LDFLAGS=
+CFLAGS=-Wall -Wextra -Werror -pedantic -std=c99
+EXE=server
+OBJ=src/utils.o src/server.o src/messages.o src/buffer.o src/log.o
+
+.PHONY: clean
+
+all: CFLAGS += -g -DDEBUG
+all: $(EXE)
+
+release: CFLAGS += -O3 -DNDEBUG
+release: $(EXE)
+
+$(EXE): src/main.o $(OBJ)
+	$(CC) -o $@ $^ $(LDFLAGS)
+
+test: LDFLAGS += -lcriterion
+test: src/test.o $(OBJ)
+	$(CC) -o $@ $^ $(LDFLAGS)
+
+%.o: %.c
+	$(CC) $(CFLAGS) -o $@ -c $<
+
+clean:
+	rm -rf $(EXE) test $(OBJ) src/test.o src/main.o
